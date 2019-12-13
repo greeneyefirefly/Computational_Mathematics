@@ -1,0 +1,234 @@
+---
+title: 'CUNY MSDS Data 605 HW #6'
+author: "Samantha Deokinanan"
+date: "6th October, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+***
+### Problem Set #1
+
+A box contains 54 red (R) marbles, 9 white (W) marbles, and 75 blue (B) marbles. If a marble is randomly selected from the box, what is the probability that it is red or blue? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+What's Given | What's Inferred
+-------------|-----------------
+ # of red marbles = 54 | P(R) = $\frac {54}{138}$
+ # of white marbles = 9 | P(W) = $\frac {9}{138}$ 
+ # of blue marbles = 75 | P(B) = $\frac {75}{138}$ 
+ Total # of marbles = 54+9+75 = 138 | -
+
+$P(R \cup B) = P(R) + P(B) = \frac {54}{138} + \frac {75}{138} = \frac {43}{46}$
+
+***
+
+### Problem Set #2
+
+You are going to play mini golf. A ball machine that contains 19 green (G) golf balls, 20 red (R) golf balls, 24 blue (B) golf balls, and 17 yellow (Y) golf balls, randomly gives you your ball. What is the probability that you end up with a red golf ball? Express your answer as a simplified fraction or a decimal rounded to four decimal places.
+
+What's Given | What's Inferred
+-------------|-----------------
+ # of green balls = 19 | P(G) = $\frac {19}{80}$
+ # of red balls = 20 | P(R) = $\frac {20}{80}$ 
+ # of blue balls = 24 | P(B) = $\frac {24}{80}$ 
+ # of yellow balls = 17 | P(Y) = $\frac {17}{80}$
+ Total # of balls = 19+20+24+17 = 80 | -
+
+$P(R) = \frac {20}{80} = \frac {1}{4}$
+
+***
+
+### Problem Set #3
+
+A pizza delivery company classifies its customers by gender and location of residence. The research department has gathered data from a random sample of 1399 customers. The data is summarized in the table below.
+
+Residence     | Males | Females
+--------------|-------|-------------
+Apartment | 81 | 228
+Dorm | 116 | 79
+With Parent(s) | 215 | 252
+Sorority/Fraternity House | 130 | 97
+Other | 129 | 72
+
+What is the probability that a customer is not male or does not live with parents? Write your answer as a fraction or a decimal number rounded to four decimal places.
+
+Residence | Male (M) | Female (F) | Total
+----------|------|--------|---------
+With Parents (P) | 215 | 252 | 467
+Without Parents (NP) | 456 | 476 | 932
+Total | 671 | 728 | 1399
+
+$P(F \cup NP) = P(F) + P(NP) - (F \cap NP) = \frac {728}{1399} + \frac {932}{1399} - \frac {476}{1399} = \frac {1184}{1399} \quad or \quad 0.8463$
+
+***
+
+### Problem Set #4
+
+Determine if the following events are independent:
+Going to the gym. Losing weight.
+
+Answer: A) Dependent 
+
+Going to the gym to exercise will allow one to lose weight.
+
+***
+
+### Problem Set #5
+
+A veggie wrap at City Subs is composed of 3 different vegetables and 3 different condiments wrapped up in a tortilla. If there are 8 vegetables, 7 condiments, and 3 types of tortilla available, how many different veggie wraps can be made?
+
+The number of different combinations of veggie wraps that can be made can be found for each items using 
+
+$C(n,k)= \frac {n!}{(n-k)!k!}$
+
+$C = \frac {8!}{(8-3)!3!} * \frac {7!}{(7-3)!3!} * \frac {3!}{(3-1)!1!}=$
+
+```{r}
+choose(8,3)*choose(7,3)*choose(3,1)
+```
+
+***
+
+### Problem Set #6
+
+Determine if the following events are independent.
+Jeff runs out of gas on the way to work. Liz watches the evening news.
+
+Answer: B) Independent
+
+Neither event has any effect on the other.
+
+***
+
+### Problem Set #7
+
+The newly elected president needs to decide the remaining 8 spots available in the cabinet he/she is appointing. If there are 14 eligible candidates for these positions (where rank matters), how many different ways can the members of the cabinet be appointed?
+
+$P(n,k)= \frac {n!}{(n-k)!}$
+
+$P(14,8)= \frac {14!}{(14-8)!} =$
+
+```{r}
+factorial(14)/factorial(6)
+```
+
+***
+
+### Problem Set #8
+
+A bag contains 9 red, 4 orange, and 9 green jellybeans. What is the probability of reaching into the bag and randomly withdrawing 4 jellybeans such that the number of red ones is 0, the number of orange ones is 1, and the number of green ones is 3? Write your answer as a fraction or a decimal number rounded to four decimal places.
+
+What's Given | What's Inferred
+-------------|-----------------
+ # of red = 9 | P(R) = $\frac {9}{22}$
+ # of orange = 4 | P(W) = $\frac {4}{22}$ 
+ # of green = 9 | P(B) = $\frac {9}{22}$ 
+ Total # of jellybeans = 9+4+9 = 22 | _
+ 
+$P(R = 0, O = 1, G = 3) = ?$
+
+We know: 
+$P(R = 0) = P(9,0)= \frac {9!}{(9-0)!}$
+
+$P(O = 1) = P(4,1)= \frac {4!}{(4-1)!}$
+
+$P(G = 3) = P(9,3)= \frac {9!}{(9-3)!}$
+
+Thus,
+P(R = 0, O = 1, G = 3) = $\frac {9!}{(9-0)!} \times \frac {4!}{(4-1)!} \times \frac {9!}{(9-3)!} \times \frac {(22-4)!4!}{22!}=$
+
+```{r}
+round(choose(9, 0) * choose(4, 1) * choose(9, 3)/choose(22, 4), 4)
+```
+
+***
+
+### Problem Set #9
+Evaluate the following expression.
+
+$\frac {11!}{7!}= 11*10*9*8 = 7920$
+
+***
+
+### Problem Set #10
+Describe the complement of the given event.
+67% of subscribers to a fitness magazine are over the age of 34.
+
+Answer: 33% of subscribers to a fitness magazine are age of 34 or younger. 
+
+***
+
+### Problem Set #11
+
+If you throw exactly three heads in four tosses of a coin you win \$97. If not, you pay me \$30.
+
+Step 1. Find the expected value of the proposition. Round your answer to two decimal places.
+
+$P(3H in 4 toss) = \frac {4!}{(4-3)!*7!*4^{2}} = \frac {4}{16} = \frac {1}{4}$
+
+Thus,
+$E(X) = \$97*0.25 - \$30*0.75 = 1.75$
+
+Step 2. If you played this game 559 times how much would you expect to win or lose? (Losses must be entered as negative.)
+
+$E(X)*n = \$1.75 * 559= \$978.25$
+
+***
+
+### Problem Set #12
+Flip a coin 9 times. If you get 4 tails or less, I will pay you \$23. Otherwise you pay me \$26.
+
+Step 1. Find the expected value of the proposition. Round your answer to two decimal places.
+
+P(4H or less in 9 toss) =
+
+```{r}
+pbinom(4, 9, 0.5)
+```
+
+Thus,
+$E(X) = \$23*0.5 - \$26*0.5 = -1.5$
+
+Step 2. If you played this game 994 times how much would you expect to win or lose? (Losses must be entered as
+negative.)
+
+$E(X)*n = -\$1.5 * 994= -\$1491$
+
+***
+
+### Problem Set #13
+
+The sensitivity and specificity of the polygraph has been a subject of study and debate for years. A 2001 study of the use of polygraph for screening purposes suggested that the probability of detecting a liar was .59 (sensitivity) and that the probability of detecting a "truth teller" was .90 (specificity). We estimate that about 20% of individuals selected for the screening polygraph will lie.
+
+What's Given | What's Inferred
+-------------|-----------------
+P(L) = 0.200 | P(TT) = 0.800
+P(sensitvity) = 0.590 | P(false positive) = 0.410
+P(specificity) = 0.900 | P(false negative) = 0.100
+- | P(L given D) = P(L)*P(sensitvity) = 0.118
+- | P(L given ND) = P(L)*P(false positive) = 0.082
+- | P(TT given D) = P(TT)*P(false negative) = 0.080
+- | P(TT given ND) = P(TT)*P(specificity) = 0.720
+
+The final table looks like:
+
+Results | Liar (L) | Truth Teller (TT)| Total
+--------|-----|-------|------
+Lie Detected (D) | 0.118 | 0.080 | 0.198
+No Lie Detected (ND) | 0.082 | 0.720 |0.802
+Total | 0.200 | 0.800 | 1.000
+
+a. What is the probability that an individual is actually a liar given that the polygraph detected him/her as such? (Show me the table or the formulaic solution or both.)
+
+$P(L|D) = \frac {P(L \cap D)}{P(D)} = \frac{0.118}{0.198} = 0.596$
+
+b. What is the probability that an individual is actually a truth-teller given that the polygraph detected him/her as such? (Show me the table or the formulaic solution or both.)
+
+$P(TT|D) = \frac {P(TT \cap ND)}{P(ND)} = \frac{0.720}{0.802} = 0.898$
+
+c. What is the probability that a randomly selected individual is either a liar or was identified as a liar by the polygraph? Be sure to write the probability statement.
+
+$P(L \cup D) = P(L) + P(D) - (L \cap D) = 0.200 + 0.198 - 0.118 = 0.280$
+
+***

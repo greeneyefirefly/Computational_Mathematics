@@ -1,0 +1,132 @@
+---
+title: 'CUNY MSDS Data 605 HW #5'
+author: "Samantha Deokinanan"
+date: "29th September, 2019"
+output:
+  html_document:
+    theme: journal
+    toc: TRUE
+    toc_depth: 4
+---
+***
+### Problem Set #1
+Choose independently two numbers B and C at random from the interval [0, 1] with uniform density. Prove that B and C are proper probability distributions. Note that the point (B,C) is then chosen at random in the unit square.
+
+A probability distribution function on x, *p(x)*, is a measure of the likelihood of observing x over some range, $x_{min} < x < x_{max}$. *p(x)* must be normalizable, such that $\int _{ { x }_{ min } }^{ { x }_{ max } }{ dx\quad p(x) = 1 }$.
+
+```{r}
+# Create two random variables, B and C, by sampling n numbers from [0,1]
+n = 50000
+B1 = runif(n, min = 0, max = 1)
+B = data.frame(B1)
+C1 = runif(n, min = 0, max = 1)
+C = data.frame(C1)
+
+# Plots of the density estimate and finding the area under the curve will give the probability of x
+library(ggplot2)
+plot1 = ggplot(B, aes(x = B1)) + geom_density() + labs(title = "Density Plot of B", y = "p(x)", x = "x")
+plot2 = ggplot(C, aes(x = C1)) + geom_density() +  labs(title = "Density Plot of C", y = "p(x)", x = "x")
+gridExtra::grid.arrange(plot1, plot2, ncol=2)
+```
+
+***
+
+### Problem Set #2
+Find the probability that:
+
+(a) B + C < 1/2
+
+```{r}
+# Density plot representation
+BplusC = B + C
+ggplot(BplusC, aes(x = B1)) +  geom_density() +  labs(title = "Density Plot of B + C < 1/2", y = "p(x)", x = "x")
+
+# Calculation of the probability
+count = 0
+for(i in 1:n){
+  if(B1[i] + C1[i] < 0.5){
+    count = count + 1
+  }
+}
+print(sprintf("The probability that B + C < 1/2 is %.03f", count/n))
+```
+
+***
+(b) BC < 1/2
+```{r}
+# Density plot representation
+BtimesC = B * C
+ggplot(BtimesC, aes(x = B1)) +  geom_density() +  labs(title = "Density Plot of BC < 1/2", y = "p(x)", x = "x")
+
+# Calculation of the probability
+count = 0
+for(i in 1:n){
+  if(B1[i] * C1[i] < 0.5){
+    count = count + 1
+  }
+}
+print(sprintf("The probability that BC < 1/2 is %.03f", count/n))
+```
+
+***
+(c) |B - C| < 1/2
+```{r}
+# Density plot representation
+absBC = abs(B - C)
+ggplot(absBC, aes(x = B1)) +  geom_density() +  labs(title = "Density Plot of |B - C| < 1/2", y = "p(x)", x = "x")
+
+# Calculation of the probability
+count = 0
+for(i in 1:n){
+  if(abs(B1[i] - C1[i]) < 0.5){
+    count = count + 1
+  }
+}
+print(sprintf("The probability that |B − C| < 1/2 is %.03f", count/n))
+```
+
+***
+(d) max{B,C} < 1/2
+```{r}
+# Density plot representation
+A = 0
+maxBC = cbind(B1, C1)
+for (i in 1:n){
+  A[i] = max(maxBC[i,])
+}
+A = data.frame(A)
+ggplot(A, aes(x = A)) +  geom_density() +  labs(title = "Density Plot of max{B,C} < 1/2", y = "p(x)", x = "x")
+
+# Calculation of the probability
+count = 0
+for(i in 1:n){
+  if(max(B1[i],C1[i]) < 0.5){
+    count = count + 1
+  }
+}
+print(sprintf("The probability that max{B,C} < 1/2 is %.03f", count/n))
+```
+
+***
+(e) min{B,C} < 1/2
+```{r}
+# Density plot representation
+A = 0
+minBC = cbind(B1, C1)
+for (i in 1:n){
+  A[i] = min(minBC[i,])
+}
+A = data.frame(A)
+ggplot(A, aes(x = A)) +  geom_density() +  labs(title = "Density Plot of min{B,C} < 1/2", y = "p(x)", x = "x")
+
+# Calculation of the probability
+count = 0
+for(i in 1:n){
+  if(min(B1[i],C1[i]) < 0.5){
+    count = count + 1
+  }
+}
+print(sprintf("The probability that min{B,C} < 1/2 is %.03f", count/n))
+```
+
+***

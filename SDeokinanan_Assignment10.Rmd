@@ -1,0 +1,64 @@
+---
+title: 'CUNY MSDS Data 605 HW #10'
+author: "Samantha Deokinanan"
+date: "3rd November, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+***
+### Problem Set #1
+
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars. A guard agrees to make a series of bets with him. If Smith bets A dollars, he wins A dollars with probability .4 and loses A dollars with probability .6. Find the probability that he wins 8 dollars before losing all of his money if:
+
+(a) he bets 1 dollar each time (timid strategy).  
+(b) he bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars (bold strategy).  
+(c) Which strategy gives Smith the better chance of getting out of jail?  
+
+***  
+##### Solution A
+
+The common distribution of the jumps of the random walk is
+
+${ f }_{ X }(x)=\begin{cases} p=0.4 \\ q=0.6 \end{cases}\begin{matrix} x=1 \\ x=-1 \end{matrix}$
+
+
+We define, for $0 \leq z \leq M$, the quantity $P_{z}$ to be the probability that the
+gambler’s stake reaches $M$ without ever having reached 0. Therefore, with z = 1 and M = 8, the probability that he wins 8 dollars before losing all of his money if he bets 1 dollar each time (timid strategy) is:  
+
+${q}_{z}=\frac {{(q/p})^{z}-1}{{(q/p)}^{M}-1}$  
+$=\frac {{(0.6/0.4})^{1}-1}{{(0.6/0.4)}^{8}-1}$  
+$=0.0203$
+
+***  
+##### Solution B
+
+Let P be our probability transition matrix.
+
+$P = \left[\begin{matrix} 1 & 0 & 0 & 0 & 0 \\ 0.6 & 0 & 0.4 & 0 & 0 \\ 0.6 & 0 & 0 & 0.4 & 0 \\ 0.6 & 0 & 0 & 0 & 0.4 \\ 0 & 0 & 0 & 0 & 1 \end{matrix}\right]$ 
+
+This matrix represents a 0.4 chance of going to the next stage and a 0.6 chance of dropping to zero at each stage. If you get to 0 or 8 you are at the absorbing state.
+
+Let $\pi^{(0)}$ be our initial probability vector. Recall that the probability vector after n steps is equal to:
+
+$\pi^{(n)} = \pi^{(0)}P^{n}$
+
+where $P^{n}$ is the matrix P raised to the n-th power. We use *hittingProbabilities(object)* to calculate the probability of ever arriving from state i to j.
+
+```{r message=FALSE, warning=FALSE}
+library(markovchain)
+P = matrix(c(1,0,0,0,0,0.6,0,0.4,0,0,0.6,0,0,0.4,0,0.6,0,0,0,0.4,0,0,0,0,1), 
+            ncol = 5, nrow = 5, byrow = TRUE)
+statesNames <- c("$0", "$1", "$2", "$4", "$8")
+mc <- new("markovchain", states = statesNames, transitionMatrix = P)
+hittingProbabilities(mc)
+```
+
+The probability that he wins 8 dollars before losing all of his money if he bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars (bold strategy) is 0.064. This is because he must win multiple times in a row else the game with end. If he starts with 1 dollar (State 2), then doubles to 2, to 4, and then to 8 (State 5), he must win the game 3 times in a row (i.e. in 3 steps). Therefore, the probability of going from State 2 to State 5 in 3 steps is given by the 2,5-entry in the matrix of hitting probabilities, namely 0.064.
+
+***  
+##### Solution C
+The strategy that gives Smith the better chance of getting out of jail is by the bold strategy, which give him 3 times the probability of winning than the timid strategy.
+
+***

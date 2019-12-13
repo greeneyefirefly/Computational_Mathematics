@@ -1,0 +1,87 @@
+---
+title: 'CUNY MSDS Data 605 HW #8'
+author: "Samantha Deokinanan"
+date: "20th October, 2019"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '4'
+---
+***
+### Problem Set #1
+A company buys 100 light bulbs, each of which has an exponential lifetime of 1000 hours. What is the expected time for the first of these bulbs to burn out?
+
+This exponential density has mean = $\frac {\mu}{n}$, according to question 10.
+
+Thus, if $X_{i}$ is an independent random variable, $E[X_{i}] = \frac {1}{\lambda_{i}} = 1000$. Therefore, $E[min X_{i}] = \frac {1000}{100} = 10$ hours is expected to pass before the first bulb burn out.
+
+***
+
+### Problem Set #2
+Assume that $X_{1}$ and $X_{2}$ are independent random variables, each having an exponential density with parameter $\lambda$. Show that $Z = X_{1} - X_{2}$ has density ${f}_{n}(z)=\frac {1}{(n-1)!} {(-log z)}^{n-1}$.
+
+The probability distribution of the sum of two or more independent random variables is the convolution of their individual distributions. The general formula for the distribution of the sum Z = X + Y of two independent integer-valued and discrete random variables is
+
+$P(Z=z)=\sum _{k=-\infty}^{\infty}{P(X=k)P(Y=z-k)}$ 
+
+Let $Y = -X_{2}$, then the counterpart for independent continuously distributed random variables with density functions $f_{X_{1}}, f_{X_{2}}$ is 
+
+$=\int _{-\infty}^{\infty}{{f}_{X_{1}}({x}_{1}){f}_{X_{2}}({x}_{2})dx}$
+
+$=\int _{-\infty}^{\infty}{{f}_{{X}_{1}}({x}_{1}){f}_{ {-X}_{2}}(z-{x}_{1})dx}$
+
+$=\int _{-\infty}^{\infty}{{f}_{ {X}_{1}}({x}_{1}){f}_{{X}_{2}}({x}_{1}-z)dx_{1}}$ 
+
+Now for z < 0, the above can be expressed as the exponential distribution ${f}_{Z}(z)$
+
+$=\int _{0}^{\infty}{\lambda{e}^{-\lambda{x}_{1}}\lambda {e}^{-\lambda {(x}_{1}-z)}d{x}_{1}}$
+
+$=\int _{0}^{\infty }{{\lambda}^{2}{e}^{-2\lambda {x}_{1}}{e}^{\lambda z) }d{x}_{1}}$
+
+$= \lambda {e}^{\lambda z}(-\frac {1}{2} {e }^{-2\lambda {x}_{1}}\overset {\infty}{\underset {0}{|})}$ 
+
+$=\frac {1}{2} \lambda {e}^{\lambda z}$
+
+The question ask for $Z = X_{1} - X_{2}$, but note that $-Z = X_{2} - X_{1}$ and $X_{i}$ are iid, thus Z and -Z have the same distribution that is symmetric around 0, ie ${f}_{Z}(z)={f}_{-Z}(-z)$.
+
+Therefore, for $z \geq 0$, ${f}_{Z}(z)=\frac {1}{2} \lambda {e}^{\lambda (-z)}$. 
+
+And altogether, ${f}_{Z}(z)=\frac {1}{2} \lambda {e}^{-\lambda |z|}$.
+
+
+***
+
+### Problem Set #3
+
+Let $X$ be a continuous random variable with mean $\mu$ = 10 and variance $\sigma^{2}$ = $\frac {100}{3}$. Using Chebyshev's Inequality, find an upper bound for the following probabilities.
+
+(a) P(|X - 10| $\geq$ 2)
+```{r}
+k <- 2/sqrt(100/3)
+1/k^2
+```
+So, the upper bound is 1.
+
+(b) P(|X - 10| $\geq$ 5)
+```{r}
+k <- 5/sqrt(100/3)
+1/k^2
+```
+So, the upper bound is 1.
+
+(c) P(|X - 10| $\geq$ 9)
+```{r}
+k <- 9/sqrt(100/3)
+1/k^2
+```
+So, the upper bound is 0.412.
+
+(d) P(|X - 10| $\geq$ 20)
+```{r}
+k <- 20/sqrt(100/3)
+1/k^2
+```
+So, the upper bound is 0.083.
+
+***

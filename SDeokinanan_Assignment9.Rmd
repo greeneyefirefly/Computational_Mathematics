@@ -1,0 +1,118 @@
+---
+title: 'CUNY MSDS Data 605 HW #9'
+author: "Samantha Deokinanan"
+date: "27th October, 2019"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '4'
+---
+***
+### Problem Set #1
+The price of one share of stock in the Pilsdorff Beer Company (see Exercise 8.2.12) is given by $Y_{n}$ on the nth day of the year. Finn observes that the differences $X_{n} = Y_{n+1} − Y_{n}$ appear to be independent random variables with a common distribution having mean $\mu$ = 0 and variance $\sigma^{2} = \frac {1}{4}$. If $Y_{1}$ = 100, estimate the probability that $Y_{365}$ is  
+(a) $\geq$ 100.  
+(b) $\geq$ 110.  
+(c) $\geq$ 120.  
+
+##### Solution
+$E[X_{n}]=E[Y_{n+1} - Y_{1}] = E[Y_{n+1}] - E[Y_{n}]$
+
+With $E[X_{i}] = 0$, $E[Y_{n+1}] = E[Y_{n}]$, and $E[Y_{1}] = 100$
+
+$Var[Y_{365}] = Var[Y_{364} + X_{365}]$  
+$=Var[Y_{364}]+Var[X_{365}]$  
+$=Var[Y_{364}]+\sigma$  
+$=Var[Y_{363}]+2\sigma=...=365\sigma$  
+$=\frac{365}{4}$  
+
+(a) $P(Y_{365} \geq 100)$  
+Since $E[Y_{365}] = 100$, $P(Y_{365} \geq 100) = 0.5$.
+
+(b) $P(Y_{365} \geq 110)$  
+Using the Central Limit Theorem, we can standardized $P(Y_{365} \geq 110) \rightarrow P(\frac {Y_{n} - Y_{1}}{\sigma\sqrt{n-1}} \geq 110) = P(z \geq \frac {10}{0.5 \sqrt{364}})$
+
+```{r}
+1-pnorm((110-100)/(0.5*sqrt(364)))
+```
+
+(c) $P(Y_{365} \geq 120)$  
+Using the Central Limit Theorem, we can standardized $P(Y_{365} \geq 120) \rightarrow P(\frac {Y_{n} - Y_{1}}{\sigma\sqrt{n-1}} \geq 120) = P(z \geq \frac {20}{0.5 \sqrt{364}})$
+
+```{r}
+1-pnorm((120-100)/(0.5*sqrt(364)))
+```
+
+***
+
+### Problem Set #2
+Calculate the expected value and variance of the binomial distribution using the moment generating function.
+
+##### Solution
+
+The probability mass function is $f(x) = C(n,x)p^{x}(1 - p)^{n - x}$.
+
+Using the pmf, the moment generating function of x is:  
+$M(t)=\sum _{x=0}^{n}{{e}^{tx}C(n,x){p}^{x}}{(1-p)}^{n-x}$
+
+Combining the exponent of x and using the binominal formula, $M(t)=[(1-p)+pe^{t}]^{n}$.
+
+The expected value can be calculated as follows:  
+$E[X]=M^{\prime}(t) \rightarrow$ the first derivative.  
+$=npe^{t}[(1-p)+pe^{t}]^{n-1}$
+
+Evaluating at t=0, $M'(0)=npe^{0}[(1-p)+pe^{0}]^{n-1}=np$.
+
+The variance can be calculated as follows:  
+$Var[X]= E[X^{2}]-(E[X]^{2})$  
+
+We therefore need the second derivative, $M"(t) \rightarrow$
+$=npe^{t}((n-1)((1-p)+pe^{t})^{n-2}pe^{t})+((1-p)+pe^{t})^{n-1}(npe^{t})$ 
+$=npe^{t}((1-p)+pe^{t})^{n-2}((1-p)+npe^{t})$
+
+Evaluating at t=0,  
+$E[X^{2}]=M^{\prime\prime}(0)=np((1-p)+p)^{n-2}((1-p)+np)=np((1-p)+np)$.
+
+Now, $Var[X]= E[X^{2}]-(E[X]^{2})$  
+$= np((1-p)+np) - (np)^{2}=np(1-p)$
+
+Therefore, $E[X]=np$ and $Var[X]=np(1-p)$.
+
+***
+
+### Problem Set #3
+Calculate the expected value and variance of the exponential distribution using the moment generating function.
+
+##### Solution
+
+The probability density function is ${f}_{X}(x)=\begin{cases} \lambda {e}^{-\lambda x} \\ 0 \end{cases}\begin{matrix} x \in [0,\infty) \\ x \notin [0,\infty) \end{matrix}$.
+
+Using the pdf, the moment generating function of x is:
+$M_{X}(t)=\int _{-\infty}^{\infty}{{e}^{tx}{f}_{X}(x)dx}$  
+$=\int _{0}^{\infty}{{e}^{tx}\lambda {e}^{-\lambda x}dx}$  
+$=\lambda \int _{0}^{\infty}{{e}^{((t-\lambda)x)}dx}$  
+$=\lambda \left[\frac {1}{t-\lambda}{e}^{((t-\lambda )x)}\right] ^{\infty}_{0}$  
+$=\lambda \left[0-\frac {1}{t-\lambda}\right]$  
+$=\frac {\lambda}{\lambda -t}$  
+
+The expected value can be calculated as follows:  
+$E[X]=M^{\prime}_{X}(t) \rightarrow$ the first derivative.  
+$=\frac {\lambda}{(\lambda -t)^{2}}$
+
+Evaluating at t=0,
+$M^{\prime}_{X}(0)=\frac {\lambda}{(\lambda -0)^{2}}=\frac {1}{\lambda}$.
+
+The variance can be calculated as follows:  
+$Var[X]= E[X^{2}]-(E[X]^{2})$  
+
+We therefore need the second derivative, $M"(t) \rightarrow$  
+$=\frac {2\lambda}{(\lambda -t)^{3}}$
+
+Evaluating at t=0, 
+$M^{\prime\prime}(0)=\frac {2\lambda}{(\lambda -0)^{3}}=\frac {2}{\lambda ^{2}}$.
+
+Now, $Var[X]= E[X^{2}]-(E[X]^{2}) = \frac {2}{\lambda ^{2}} - \frac {1}{\lambda ^{2}} = \frac {1}{\lambda ^{2}}$
+
+Therefore, $E[X]=\frac {1}{\lambda}$ and $Var[X]=\frac {1}{\lambda ^{2}}$.
+
+***

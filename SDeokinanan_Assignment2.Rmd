@@ -1,0 +1,123 @@
+---
+title: 'CUNY MSDS Data 605 HW #2'
+author: "Samantha Deokinanan"
+date: "8th September, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+***
+
+### Problem Set #1.1 
+Show that ${ A }^{ T }A \neq A{ A }^{ T }$ in general. (Proof and demonstration)
+
+#### Proof
+Let $A \in { R }^{ m\times n }$, in general, there are two cases. These are:
+
+##### Case 1
+In most cases, when $m=n$, ${ A }=\left[ \begin{matrix} a & b \\ c & d \end{matrix} \right]$, and ${ A }^{ T }=\left[ \begin{matrix} a & c \\ b & d \end{matrix} \right]$,  then 
+
+${ A }^{ T }A = \begin{bmatrix} a & c \\ b & d \end{bmatrix}\begin{bmatrix} a & b \\ c & d \end{bmatrix}=\begin{bmatrix} { a }^{ 2 }+{ c }^{ 2 } & ab+cd \\ ab+dc & { b }^{ 2 }+{ d }^{ 2 } \end{bmatrix}$
+
+$A{ A }^{ T } = \begin{bmatrix} a & b \\ c & d \end{bmatrix}\begin{bmatrix} a & c \\ b & d \end{bmatrix}=\begin{bmatrix} { a }^{ 2 }+{ b }^{ 2 } & ac+bd \\ ac+bd & { c }^{ 2 }+{ d }^{ 2 } \end{bmatrix}$
+
+Since matrix multiplication is not commutative, ${ A }^{ T }A \neq A{ A }^{ T }$.
+
+##### Case 2
+If $m \neq n$, $A$ is size $m \times n$, and ${ A }^{ T }$ will be an $n \times m$ matrix. Then ${ A }^{ T }A$ will be a square matrix of size $n \times n$ and $A{ A }^{ T }$ will be a square matrix of size $m \times m$, making these two matrices not equal to each other. This will hold for any non-square matrix $A$. 
+
+#### Demonstration
+
+```{r}
+# Let A be an nxn matrix 
+set.seed(525)
+A <- matrix(runif(2*2), ncol = 2)
+A
+
+# Its transpose
+At <- t(A)
+At
+
+# A^T * A will give
+AtA <- At %*% A
+AtA
+
+# AA^T will give
+AAt <- A %*% At
+AAt
+
+# Test if they are equal
+AtA == AAt
+```
+
+***
+
+### Problem Set #1.2
+For a special type of square matrix $A$, we get ${ A }^{ T }A =  A{ A }^{ T }$. Under what conditions could this be true? (Hint: The Identity matrix $I$ is an example of such a matrix).
+
+The conditions that may lead to ${ A }^{ T }A = A{ A }^{ T }$ are:
+
+1. When $A$ is a symmetric matrix, i.e. $A = {A}^{T}$, then ${ A }^{ T }A = A{ A }^{ T } \rightarrow AA=AA$
+2. When $A$ is an orthogonal matrix, i.e. ${ A }^{ T } = { A }^{ -1 }$, then ${ A }^{ T }A =  A{ A }^{ T } \rightarrow { A }^{ -1 }A =  A{ A }^{ -1 } \rightarrow I = I$
+
+***
+
+### Problem Set #2 
+Write an R function to factorize a square matrix A using Lower-Upper or Lower-Diagonal-Upper factorization, whichever is prefer.
+
+#### function factorize
+*factorize* is a function that factorize a square matrix A into its Lower-Upper triangular matrices such that $A = LU$, where L is a unit lower triangular matrix and U is the echelon form of A.
+
+```{r}
+factorize <- function(A){
+  # Ensure A is n by n
+  size <- dim(A)
+  if (size[1] != size[2]){
+    stop('A is not n by n')
+  } 
+  # number of columns
+  nc <- size[1]
+  # Initialize L as an identity matrix and U as matrix A 
+  L <- diag(nc)
+  U <- A
+  # Iterate operations until nc - 1 column
+    for (i in 1:(nc-1)){
+  # Reduce matrix A to an echelon form U by a sequence of row replacement operations 
+        j <- i + 1
+        for (j in (i + 1):nc){
+            alpha <- -U[j,i] / U[i,i]
+            U[j,i]  <- 0
+            i2 <- i + 1
+            for (i2 in (i + 1):nc){
+                U[j,i2] <- U[j,i2] + alpha * U[i,i2] 
+            }
+  # Place entries in L such that the same sequence of row operations reduces L to I
+            L[j,i] <- -alpha
+        } 
+    }
+    result <- list("Lower Triangular Matrix" = L, "Upper Triangular Matrix" = U)
+    return(result)
+}
+```
+
+***
+
+#### Demonstration
+
+```{r}
+A <- matrix(c(3,-3,6,-9,-7,5,-4,5,-2,1,0,-5,2,0,-5,12), nrow=4)
+A
+LU <- factorize(A)
+LU
+
+# Test confirmation
+L <- LU[[1]]
+U <- LU[[2]]
+A == L%*%U
+```
+
+***
+
+### Works Cited
+* Geezer, Robert A. "A first course in linear algebra." 2008.

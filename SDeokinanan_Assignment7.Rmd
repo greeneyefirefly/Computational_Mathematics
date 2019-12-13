@@ -1,0 +1,146 @@
+---
+title: 'CUNY MSDS Data 605 HW #7'
+author: "Samantha Deokinanan"
+date: "13th October, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+***
+### Problem Set #1
+Let $X_{1}, X_{2},...,X_{n}$ be $n$ mutually independent random variables, each of which is uniformly distributed on the integers from 1 to $k$. Let $Y$ denote the minimum of the $X_{i}$'s. Find the distribution of $Y$.
+
+For the $P(Y = j)$, we need to find the number of ways to assign the $X_{i}$'s from 1 $\leq$ j $\leq$ k. That is:
+
+For $Y = 1$, the number of assignements is $k^{n}-(k-1)^{n}$. Notice that $k^{n}$ is the total number of assignment, and $(k-1)^{n}$ is the number of assignments not equal to 1.
+
+For $Y = 2$, this expression becomes $(k-1)^{n}-(k-2)^{n}$.
+
+And by induction, for $Y = j$, this expression becomes $(k-j+1)^{n}-(k-j)^{n}$.
+
+Altogether, for 1 $\leq$ j $\leq$ k, the distribution of Y is the number of ways that to assign $X_{1}, X_{2},...,X_{n}$ from j to k, divided by the total number of ways to assign $X_{1}, X_{2},...,X_{n}$ to values from 1 to k, i.e. $\frac {(k-j+1)^{n}-(k-j)^{n}}{k^{n}}$.
+
+
+***
+
+### Problem Set #2
+
+Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer's expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.)
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Load the R package stats that contains functions for statistical calculations and random
+# number generation
+library(stats)
+```
+
+***
+
+##### Part A
+What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years).
+
+The geometric distribution gives the probability that the first occurrence of success requires k independent trials, each with success probability p. If the probability of success on each trial is p, then the probability that the kth trial (out of k trials) is the first success is:
+
+$P(X=k)={(1-p)}^{k-1}p$ for k = 1, 2, 3, ....  
+$P(X=k)= 0$ otherwise.
+
+The expected value, $E(X)$, is therefore $\frac {1}{p}$ and the standard deviation, $\sigma$, is $\sqrt {\frac {1-p}{p^{2}}}$.
+
+```{r}
+k = 8
+p = 0.1
+
+# Geometric Distribution
+# The probability that the machine will fail after 8 years is
+1 - pgeom(k, p)
+
+# Expected Value
+1/p
+
+# Standard Deviation
+sqrt((1-p)/p^2)
+```
+
+***
+
+##### Part B
+What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as an exponential.
+
+The exponential distribution can be used to model time between failures, such as when units have a constant, instantaneous rate of failure (hazard function). The probability density function is:
+
+$P(X=k)=\frac {1}{\theta}{e}^{-\frac {k-\lambda}{\theta}}$ , for k>$\lambda$, $\theta$>0, and $-\infty<\lambda<\infty$.
+
+The expected value, $E(X)$, is therefore $\frac {1}{\lambda}$, and the standard deviation, $\sigma$, is $\frac {1}{\lambda}$.
+
+```{r}
+k = 8
+theta = 0.1
+
+# Exponential Distribution
+# The probability that the machine will fail after 8 years is
+1 - pexp(k, theta)
+
+# Expected Value
+1/theta
+
+# Standard Deviation
+1/theta
+```
+
+***
+##### Part C
+What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+The binomial distribution is used to represent the number of events that occurs within n independent trials. Possible values are integers from zero to n. The probability mass function is:
+
+$P(X=k)=\left( \begin{matrix} n \\ k \end{matrix} \right) {p}^{k}{(1-p)}^{n-k}$ , for k = 0, 1, ..., n.
+
+The expected value, $E(X)$, is $np$, while the standard deviation, $\sigma$, is $\sqrt {np(1-p)}$. 
+
+```{r}
+k = 0
+n = 8
+p = 0.1
+
+# Binomial Distribution
+# The probability that the machine will fail after 8 years is
+pbinom(k, n, p)
+
+# Expected Value
+n*p
+
+# Standard Deviation
+sqrt(n*p*(1-p))
+```
+
+
+***
+##### Part D
+What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a Poisson.
+
+The Poisson distribution is a discrete distribution that models the number of events based on a constant rate of occurrence. The Poisson distribution can be used as an approximation to the binomial when the number of independent trials is large and the probability of success is small. The probability mass function is:
+
+$P(X=k)=\frac {{e}^{-\lambda}{\lambda}^{k}}{k!}$ , for k = 0, 1, ..., and $\lambda$ > 0. 
+
+The expected value, $E(X)$, is $\lambda$, while the standard deviation, $\sigma$, is $\sqrt {\lambda}$.
+
+```{r}
+k = 0
+lambda = 0.8
+
+# Poisson Distribution
+# The probability that the machine will fail after 8 years is
+ppois(k, lambda)
+
+# Expected Value
+lambda
+
+# Standard Deviation
+sqrt(lambda)
+```
+
+***
+
+##### Works Cited
+
+* [Methods and Formulas for Probability Distributions](https://support.minitab.com/en-us/minitab/18/help-and-how-to/probability-distributions-and-random-data/how-to/probability-distributions/methods-and-formulas/methods-and-formulas/) Last visited 10/08/2019.

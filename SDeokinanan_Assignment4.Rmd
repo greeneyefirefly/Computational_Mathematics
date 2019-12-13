@@ -1,0 +1,122 @@
+---
+title: 'CUNY MSDS Data 605 HW #4'
+author: "Samantha Deokinanan"
+date: "22th September, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+***
+
+### Problem Set #1
+In this problem, we’ll verify that SVD and Eigenvalues are related. Given a 3×2 matrix: $A =\left[ \begin{matrix} 1 & 2 & 3 \\ -1 & 0 & 4 \end{matrix} \right]$ write code to compute $X=A{ A }^{ T }$ and $Y={ A }^{ T }A$. Then, compute the eigenvalues and eigenvectors of $X$ and $Y$.
+
+```{r}
+A = matrix(c(1,-1,2,0,3,4), ncol = 3)
+X = A%*%t(A)
+X
+Y = t(A)%*%A
+Y
+# Obtaining eigenvalues and eigenvectors using eigen() function
+eig_X = eigen(X)
+eig_X
+eig_Y = eigen(Y)
+eig_Y
+```
+
+***
+
+Now, compute the left-singular, singular values, and right-singular vectors of $A$ using the svd().  Examine the two sets of singular vectors and show that they are indeed eigenvectors of $X$ and $Y$. 
+
+```{r}
+SVD = svd(A)
+SVD
+
+SVD = list("singular values" = SVD$d, "left singular" = SVD$u, "right singular" = SVD$v)
+# Compare the eigenvector of X with left singular 
+# Here, we see the first column in the left singular matrix is the -1 multiple of the 
+# first column of the X eigenvector, while the second columns are exactly the same, this 
+# is because they are in unit vector form.
+SVD$`left singular` 
+eig_X$vectors
+
+# Switching the sign of the first column and rounding to a specific precision, they become
+# equal
+SVD$`left singular`[,1] = -SVD$`left singular`[,1]
+round(SVD$`left singular`, d = 3) == round(eig_X$vectors, d = 3)
+
+# Compare the eigenvector of Y with right singular 
+# We see the first column in the right singular matrix is a -1 multiple of the first 
+# column of the Y eigenvector, while the second columns are exactly the same, this 
+# is because they are in unit vector form.
+SVD$`right singular` 
+eig_Y$vectors[1:3,1:2]
+
+# Switching the sign of the first column and rounding to a specific precision, they become
+# equal
+SVD$`right singular`[,1] = -SVD$`right singular`[,1]
+round(SVD$`right singular`, d = 3) == round(eig_Y$vectors[1:3,1:2], d = 3)
+```
+***
+
+In addition, the two non-zero eigenvalues (the 3rd value will be very close to zero, if not zero) of both $X$ and $Y$ are the same and are squares of the non-zero singular values of $A$.
+
+```{r}
+# Compare the eigenvalues of X and Y with the square of the singular values 
+(SVD$`singular values`)^2
+eig_X$values 
+eig_Y$values # 3rd value will be very close to zero, if not zero
+
+# Rounding to a specific precision, they all become equal
+round((SVD$`singular values`)^2, d = 3) == round(eig_X$values, d = 3)
+round((SVD$`singular values`)^2, d = 3) == round(eig_Y$values[1:2], d = 3)
+```
+
+In the end, it is evident that SVD, Eigenvalues and Eigenvectors are related.
+
+***
+
+### Problem Set #2
+Write a function to compute the inverse of a well-conditioned full-rank square matrix using co-factors. In order to compute the co-factors, you may use built-in commands to compute the determinant. Your function should have the following signature: *B = myinverse(A)* where $A$ is a matrix and $B$ is its inverse and $A \times B = I$. The off-diagonal elements of $I$ should be close to zero, if not zero. Likewise, the diagonal elements should be close to 1, if not 1. Small numerical precision errors are acceptable but the function *myinverse()* should be correct and must use co-factors and determinant of $A$ to compute the inverse.
+
+```{r}
+# Function myinverse() compute the inverse of a well-conditioned full-rank square matrix 
+# using co-factors, where B = myinverse(A) such that A is a matrix and B is its inverse
+# and A×B = I.
+
+myinverse = function(A){
+  size = dim(A)
+  # Ensure matrix A is square
+  if (size[1] != size[2]){
+    return ('A is not a square matrix!')
+  }
+  n = nrow(A)
+  # Initialize and compute the cofactor matrix
+  cofactors = diag(n)
+  for (i in 1:n){
+    for (j in 1:n){
+      cofactors[i,j] = (det(A[-i,-j]) * (-1)^(i+j)) 
+    }
+  }
+  # Compute the inverse of A which equals to the transpose of cofactor matrix times the 
+  # determinant of A
+  inverse = t(cofactors) / det(A)
+  return (inverse)
+}
+```
+
+```{r}
+# Test Confirmation #1
+A = matrix(c(5,-5,6,-4,0,3,4,5,3,7,9,2,1,1,-2,1), ncol = 4)
+B = myinverse(A)
+B
+A %*% B
+
+# Test Confirmation #2
+round(matlib::inv(A), d = 3) == round(B, d = 3)
+```
+
+***
+### Works Cited
+* Geezer, Robert A. "A first course in linear algebra." 2008: pg 352.

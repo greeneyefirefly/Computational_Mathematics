@@ -1,0 +1,219 @@
+---
+title: 'CUNY MSDS Data 605 HW #11'
+author: "Samantha Deokinanan"
+date: "17th November, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+***  
+### The Dataset 
+
+The `who.csv` dataset contains real-world data from 2008. The variables included are as follow: 
+
+Country: name of the country  
+LifeExp: average life expectancy for the country in years  
+InfantSurvival: proportion of those surviving to one year or more  
+Under5Survival: proportion of those surviving to five years or more  
+TBFree: proportion of the population without TB  
+PropMD: proportion of the population who are MDs  
+PropRN: proportion of the population who are RNs  
+PersExp: mean personal expenditures on healthcare in US dollars at average exchange rate  
+GovtExp: mean government expenditures per capita on healthcare, US dollars at average exchange rate  
+TotExp: sum of personal and government expenditures  
+
+***  
+#### Loading the Data
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Load the dataset
+dataset = data.frame(read.csv(file = "who.csv", header = TRUE, sep = ","))
+```
+
+***
+*WHO's Dataset*
+```{r echo=FALSE}
+head(dataset) 
+```
+
+***
+#### Data Exploration & Visualization
+
+A few exploratory analyses were conducted to understand the data. The descriptive of the continuous variables highlights that a few variables are skewed and have kurtosis that are not nearly zero as expected for normal distribution. 
+
+```{r}
+psych::describe(dataset[,2:10])
+```
+
+From the `pairs()` function plot, a majority of the plots do not represent a linear relationship with another. Data transformation will be carried out later on to compare models.
+
+```{r}
+pairs(dataset[,-1], gap = 0.5, col = "tomato") 
+```
+
+***  
+### Analysis & Results
+#### P1: Simple Linear Regression 
+
+*Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the variables. Provide and interpret the F statistics, R^2, standard error,and p-values only. Discuss whether the assumptions of simple linear regression met.*
+
+$LifeExp = \beta_{0} + \beta_{1} \times TotExp$
+
+```{r}
+# Fitting the linear model
+model1 = lm(LifeExp ~ TotExp, data = dataset)
+summary(model1)
+plot(dataset$TotExp, dataset$LifeExp, xlab = "Total Expenditures", 
+     ylab = "Life Expectancy",
+     main = "Scatterplot of Life Expectancy vs Total Expenditures")
+abline(model1, col = "tomato")
+```
+
+The model resulted to be significant at the 95% confidence level since all the p-values are even less than 0.001. Therefore, the best fit model is $LifeExp = 6.475\times 10^{1} + 6.297\times 10^{-5} \times TotExp$.
+
+However, from the adjusted $R^{2}$, this linear model only explains 25.4% of the variation in the life expectancy with the sum of personal and government expenditures. This is a weak correlation. Next, the F-statistic suggest that adding `TotExp` to the model improves the model compared to only having an intercept. With a small p-value, the current model is better than the reduced model.
+
+The standard error values are smaller than the estimated coefficient values. This suggests that there is very little variability in the slope estimate. The residual standard error is 9.37 on 188 degrees of freedom. This suggests that the actual life expectancy required to estimate total expenditures can deviate from the true regression line by approximately 9.37 years, on average. 
+
+```{r}
+# Residuals vs Life Expectancy for Linear Regression Plot
+plot(model1$residuals ~ dataset$LifeExp[order(dataset$LifeExp)],
+     main = "Residuals vs Life Expectancy for Linear Regression", 
+     xlab = "Life Expectancy", ylab = "Residuals")
+abline(h = 0, col = "tomato")
+
+# Histogram of Residuals
+hist(model1$residuals, main = "Histogram of Residuals", xlab = "Residuals", 
+     ylab = "Density", ylim = c(0, 0.07), prob = TRUE)
+curve(dnorm(x, mean = mean(model1$residuals), sd = sd(model1$residuals)), col = "tomato", 
+      add = TRUE)
+
+# Q-Q Plot
+qqnorm(model1$residuals)
+qqline(model1$residuals, col = "tomato")
+```
+
+The plot of the residual depicts that the errors have a no constant variance since they are scattered with some lie near another and the spread is far from zero. Looking at a histogram of the model residual, it is clear that the residual are skewed, and does not strongly follow a normal distribution, additional confirmed by the normal Q-Q plot where a majority of points diverge from the line.
+
+In all, this model does not meet the assumption for a good simple linear regression model. With the lack of variability explanations and not fitting to a normal distribution, this model is a poor fit.
+
+***
+
+#### P2: A Better Model?
+
+*Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06 power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r re-run the simple regression model using the transformed variables. Provide and interpret the F statistics, R^2, standard error, and p-values. Which model is "better?"*
+
+$LifeExp^{4.6} = \beta_{0} + \beta_{1} \times TotExp^{0.06}$
+
+This model requires data transformation. Before a plot of `LifeExp` with `TotExp` did not show a linear relationship. However, with the transformed data, there seems to be one.
+
+```{r}
+dataset$LifeExp4.6 <- dataset$LifeExp^4.6
+dataset$TotExp0.06 <- dataset$TotExp^0.06
+
+# Fitting the linear model
+model2 = lm(LifeExp4.6 ~ TotExp0.06, data = dataset)
+summary(model2)
+plot(dataset$TotExp0.06, dataset$LifeExp4.6, xlab = "Total Expenditures", 
+     ylab = "Life Expectancy",
+     main = "Scatterplot of Life Expectancy vs Total Expenditures")
+abline(model2, col = "tomato")
+```
+
+The model resulted to be significant at the 95% confidence level since all the p-values are even less than 0.001. Therefore, the best fit model is $LifeExp^{4.6} = -7.37\times 10^{8} + 6.20\times 10^{8} \times TotExp^{0.06}$.
+
+In this model, the adjusted $R^{2}$ is 0.728. This means that this linear model explains 72.8% of the variation in the life expectancy to the power of 4.6 with the sum of personal and government expenditures raised to the power of 0.06. This is a relatively strong correlation. Next, the F-statistic suggest that adding `TotExp0.06` to the model improves the model compared to only having an intercept. With a small p-value, the current model is better than the reduced model, and the model before since it went from 65.26 to 507.7.
+
+The standard error values are smaller than the estimated coefficient values. This suggests that there is very little variability in the slope estimate. The residual standard error is $9.05 \times 10^{7}$ on 188 degrees of freedom. This suggests that the actual life expectancy required to estimate total expenditures can deviate from the true regression line by approximately $(90490000^{1/4.6} =) 53.7$ years, on average. 
+
+```{r}
+# Life Expectancy^4.6 vs Residuals for Linear Regression Plot
+plot(model2$residuals ~ dataset$LifeExp4.6[order(dataset$LifeExp4.6)],
+     main = "Life Expectancy^4.6 vs Residuals for Linear Regression", 
+     xlab = "Life Expectancy^4.6", ylab = "Residuals")
+abline(h = 0, col = "tomato")
+
+# Histogram of Residuals
+hist(model2$residuals, main = "Histogram of Residuals", xlab = "Residuals", ylab = "Density", 
+     ylim = c(0, 0.000000005), prob = TRUE)
+curve(dnorm(x, mean = mean(model2$residuals), sd = sd(model2$residuals)), col = "tomato", 
+      add = TRUE)
+
+# Q-Q Plot
+qqnorm(model2$residuals)
+qqline(model2$residuals, col = "tomato")
+```
+
+The plot of the residual depicts that the errors have a constant variance since they are scattered randomly. The histogram of the model residual depicts that it is nearly normal distribution, additional confirmed by the normal Q-Q plot where a majority of points are on or near the line.
+
+In all, this model does meet the assumption for a good simple linear regression model. With the a large explanation of variability by the transformed variables and fitting to a normal distribution, this model is the better fit.
+
+***  
+#### P3: Forecasting Life Expectancy, pt1
+
+*Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life expectancy when TotExp^.06=2.5.*
+
+```{r}
+test <- data.frame(TotExp0.06 = c(1.5, 2.5))
+(predict(model2, newdata = test))^(1/4.6)
+```
+
+With $LifeExp^{4.6} = -7.37\times 10^{8} + 6.20\times 10^{8} \times TotExp^{0.06}$ as the regression model, the forecast life expectancy when total expenditure^0.06 is 1.5 and 2.5 is 63.3 and 86.5 years, respectively.
+
+***
+#### P4: Multiple Linear Regression
+
+*Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?*
+
+$LifeExp = \beta_{0} + \beta_{1} \times PropMd + \beta_{2} \times TotExp + \beta_{3} \times PropMD \times TotExp$
+
+```{r}
+model3 <- lm(LifeExp ~ TotExp + PropMD + I(TotExp * PropMD), data = dataset)
+summary(model3)
+```
+
+The model resulted to be statistically significant at the 95% confidence level since all the p-values are less than 0.001. Therefore, the best fit model is $LifeExp = 6.277\times 10^{1} + 7.233\times 10^{-5} \times PropMd + 1.497\times 10^{3} \times TotExp +  -6.026\times 10^{-3} \times PropMD \times TotExp$.
+
+In this model, the adjusted $R^{2}$ is 0.347. This means that this linear model explains 34.7% of the variation in the life expectancy with exploratory and interaction variables of the model. This model is another weak correlation. The F-statistic of 34.49 suggest that adding these three variables to the model slightly improve the model compared to only having an intercept. Even with a small p-value, the current model is better than the reduced model, but Model 3 does not fit well than compared to Model 2.
+
+The standard error values are smaller than the estimated coefficient values. This suggests that there is very little variability in the slope estimate. The residual standard error is 8.77 on 186 degrees of freedom. This suggests that the actual life expectancy required to estimate total expenditures can deviate from the true regression line by approximately 8.77 years, on average. 
+
+```{r}
+# Life Expectancy vs Residuals for Linear Regression Plot
+plot(model3$residuals ~ dataset$LifeExp[order(dataset$LifeExp)],
+     main = "Life Expectancy vs Residuals for Linear Regression", 
+     xlab = "Life Expectancy", ylab = "Residuals")
+abline(h = 0, col = "tomato")
+
+# Histogram of Residuals
+hist(model3$residuals, main = "Histogram of Residuals", xlab = "Residuals", ylab = "Density",
+     ylim = c(0, 0.07), prob = TRUE)
+curve(dnorm(x, mean = mean(model3$residuals), sd = sd(model3$residuals)), col = "tomato", 
+      add = TRUE)
+
+# Q-Q Plot
+qqnorm(model3$residuals)
+qqline(model3$residuals, col = "tomato")
+```
+
+The plot of the residual depicts that the errors have a constant variance since they are scattered randomly. The histogram of the model residual depicts that the residual are skewed, and, from the normal Q-Q plot, a majority of points are not on or near the line.
+
+In all, this model does not meet the assumption for a good multiple linear regression model. With the lack of explanation on variability and not fitting to a normal distribution, this model is not a good fit.
+
+***
+
+#### P5: Forecasting Life Expectancy, pt2
+
+*Forecast LifeExp when PropMD = 0.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?*
+
+```{r}
+test <- data.frame(PropMD = c(0.03), TotExp = c(14))
+predict(model3, newdata = test)
+```
+
+With $LifeExp = 6.277\times 10^{1} + 7.233\times 10^{-5} \times PropMd + 1.497\times 10^{3} \times TotExp +  -6.026\times 10^{-3} \times PropMD \times TotExp$ as the regression model, the forecast life expectancy when total expenditure is 1.5 and the proportion of the population who are MDs is 0.03 is 107.7 years, respectively.
+
+Life expectancy is defined as the average time a person can expect to live in a specific country. Even with technology today, a life expectancy of 107.7 years is very unrealistic. Finding a single individual who is 100 years and older is a rare observation, and ends up recorded as an outlier. Looking at the model itself, there are a few variables that can lead to errors in these prediction. For instance, if all variables are kept constant, the life expectancy is 63 years which is relatively high for many underdeveloped countries. 
+
+***

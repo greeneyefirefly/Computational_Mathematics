@@ -1,0 +1,303 @@
+---
+title: 'CUNY MSDS Data 605 Final Project'
+author: "Samantha Deokinanan"
+date: "12th December, 2019"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '4'
+---
+***  
+### Problem 1  {.tabset .tabset-fade .tabset.-pills}
+
+Using R, generate a variable X that has 10,000 random uniform numbers from 1 to N, where N can be any number of your choosing greater than or equal to 6. Then generate a random variable Y that has 10,000 random normal numbers with a mean of $\mu=\sigma=\frac{(N+1)}{2}$.
+
+```{r}
+set.seed(525)
+r = 10000
+X = runif(r, 1, 8)
+
+mu = (8+1)/2
+sigma = mu
+Y = rnorm(r, mean = mu, sd = sigma)
+```
+
+***
+#### Question A
+
+Calculate as a minimum the below probabilities. Assume the smaller letter "x" is estimated as the median of the X variable, and the small letter "y" is estimated as the 1st quartile of the Y variable. Interpret the meaning of all probabilities.
+
+1. $P(X > x | X > y)$
+
+This is equal to $\frac {P(X > x \ \& \ X > y)}{P(X > y)}$.
+
+2. $P(X > x, Y > y)$
+
+This is equal to $P(X > x)*P(Y > y)$.
+
+3. $P(X < x | X > y)$
+
+This is equal to $\frac {P(X < x \ \& \ X > y)}{P(X > y)}$.
+
+```{r}
+x = median(X)
+y = quantile(Y, 1/4)
+
+# Part 1: P(X > x | X > y) is
+P1 = (length(X[X>x & X>y])/length(X)) /(length(X[X>y])/length(X))
+P1
+
+# Part 2: P(X > x, Y > y) is
+P2 = (length(X[X>x]) / length(X))*(length(Y[Y>y]) / length(Y))
+P2
+
+# Part 3: P(X < x | X > y) is
+P3 = (length(X[X<x & X>y])/length(X))/(length(X[X>y])/length(X))
+P3
+```
+
+***
+#### Question B
+Investigate whether $P(X > x \ \&\ Y > y) = P(X > x)P(Y > y)$ by building a table and evaluating the marginal and joint probabilities.
+
+```{r}
+a = length(X[X > x & Y > y]) # P(X > x & Y > y)
+b = length(X[X > x & Y < y]) # P(X > x & Y < y)
+c = length(X[X < x & Y > y]) # P(X < x & Y > y)
+d = length(X[X < x & Y < y]) # P(X < x & Y < y)
+
+ptable <- matrix(c(a,b,c,d), nrow = 2)
+colnames(ptable) <- c('X > x', 'X < x')
+rownames(ptable) <- c('Y > y', 'Y < y')
+ptable <- as.table(ptable)
+ptable
+
+# a is P(X > x & Y > y)
+a/10000
+
+# P(X > x)P(Y > y)
+P2
+```
+
+From the above, it is clear that the probabilities are very close to each other, 0.377 and 0.375 receptively.
+
+***
+#### Question C
+Check to see if independence holds by using Fisher's Exact Test and the Chi-Square Test. What is the difference between the two? Which is most appropriate?
+
+Both the Fisher's Exact Test and the Chi-Square Test are test of independence such that the probability distribution of one variable does not affect the presence of another.
+
+$H_{0} =$ the proportions at one variable are the same for different values of the second variable.
+
+```{r}
+fisher.test(ptable)
+```
+
+The p-value of 0.3678 for the test does not provide any evidence against the assumption of independence. This means that we cannot confidently claim any difference in the two sets of data.
+
+```{r}
+chisq.test(ptable)
+```
+
+The p-value of 0.3678 is greater than the 0.05 significance level, we do not reject the null hypothesis that the X dataset is independent of the Y dataset.
+
+The chi-squared test applies an approximation assuming the sample is large, while the Fisher's exact test is an exact significant test for small sample sizes. In the Fisher's test, a false rejection equals to the significance level of the test, which is not necessarily true for approximate tests such as the chi-squared test. In short, Fisher’s exact test relies on computing the p-value according to the hypergeometric distribution using binomial coefficients. Since the computed factorials can become very large, Fisher’s exact test may not work for large sample sizes.$^1$
+
+$^1$ <font size= "1.5"> Kim, Hae-Young. “Statistical notes for clinical researchers: Chi-squared test and Fisher's exact test.” Restorative dentistry & endodontics vol. 42,2 (2017): 152-155. doi:10.5395/rde.2017.42.2.152</font> 
+
+***
+### Problem 2 {.tabset .tabset-fade .tabset.-pills}
+
+House Prices: Advanced Regression Techniques is a Kaggle Challenge with a dataset that proves 79 explanatory variables describing (almost) every aspect of residential homes in Ames, Iowa. 
+
+There is a training (n = 1460) and a test (n = 1459) dataset. Some of the variables of interested are listed below. Briefly, there is an interest in the square feet of the porch, lot, and garage. 
+
+Variables | Descriptions
+----------|-------------
+MSZoning | Identifies the general zoning classification of the sale 
+LotFrontage | Linear feet of street connected to property
+LotArea | Lot size in square feet
+WoodDeckSF | Wood deck area in square feet
+OpenPorchSF | Open porch area in square feet
+EnclosedPorch | Enclosed porch area in square feet
+3SsnPorch | Three season porch area in square feet
+ScreenPorch | Screen porch area in square feet
+PoolArea | Pool area in square feet
+PoolQC | Pool quality
+GarageArea | Size of garage in square feet
+GarageQual | Garage quality
+OverallCond | Rates the overall condition of the house
+SalePrice | Selling Price of the House
+------------------------------------------------------
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Libraries needed
+library(tidyverse)
+library(psych)
+library(Matrix)
+library(MASS)
+library(scales)
+
+testdata = read.csv("test.csv")
+train = read.csv("train.csv")
+```
+
+#### Descriptive & Inferential Statistics
+##### Decriptive Statistics of Numeric and Factor Variables
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Descriptive statistics of the numeric variables
+train %>% keep(is.numeric) %>% describe()
+# Descriptive statistics of the factor variables
+train %>% keep(is.factor) %>% summary()
+```
+
+##### Scatter Plots of Independent Variables with Dependent Variable
+
+The dependent variable is the selling price of the house, `SalePrice`. The independent variables are the lot size in square feet, `LotArea` and size of garage in square feet, `GarageArea`. Moreover, one of independent variables of interest is the newly created variable of the total porch area which is the sum of all porch area (i.e. `WoodDeckSF`, `OpenPorchSF`, `EnclosedPorch`, `3SsnPorch`, and `ScreenPorch`) in square feet called `TotalPorch`.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Scatterplots of Independent Variables with Dependent Variable: SalePrice
+
+# vs LotArea
+ggplot(train, aes(x = log(LotArea/1000), y = log(SalePrice/1000))) + geom_point(color = "#69b3a2", alpha = 0.5) + labs(title = "Home Sale Price vs Lot Size", x = "Lot Size in log(Kft^2)", y = "Price in log(K$)") + theme_minimal()
+
+# vs TotalPorch: Sum of all porch area
+train$TotalPorch = rowSums(train[,c(67:71)])
+
+ggplot(train, aes(x = TotalPorch, y = (SalePrice/1000))) + geom_point(color = "#69b3a2", alpha = 0.5) + labs(title = "Home Sale Price vs Total Porch Area", x = "Total Porch Area in K ft^2", y = "Price in K$") + theme_minimal()
+
+# vs GarageArea
+ggplot(train, aes(x = (GarageArea/1000), y = (SalePrice/1000))) + geom_point(color = "#69b3a2", alpha = 0.5) + labs(title = " Home Sale Price vs Garage Area", x = "Garage Area in K ft^2", y = "Price in K$") + theme_minimal()
+```
+
+##### Initial Correlation Analysis
+
+Correlation matrix will be of SalePrice, LotArea, PoolArea, GarageArea, and TotalPorch. Following it, will be a correlation hypothesis testing where:
+
+Null: true correlation is equal to 0
+
+````{r message=FALSE, warning=FALSE, paged.print=FALSE}
+test = train[,c(5,63,72,82,81)]
+res = corr.test(test, y = NULL, use = "pairwise", method = "pearson", adjust = "holm", alpha =.2, ci = TRUE, minlength=5)
+print(res, short = FALSE)
+```
+
+Let's take a closer look at the analysis above. Firstly, the correlation matrix, it highlights that no pairs of variable have a very strong relationship with another (r > 0.80). At most, the sale price and garage area have a moderate positive correlation of 0.62. In addition, there is a slight positive correlation between  sale price with lot area, and sale price with total porch area, r = 0.26 and r = 0.39, respectively. Now at the 80% confidence level, the left diagonal of the probability values matrix suggests that there are evidence that a correlation exist since the p-values are less than 0.2. The familywise error rate is the probability of making at least one Type I Error in a series of hypothesis tests. Fortunately, `corr.test` adjust for multiple testing using Holm method where tests are run and then ordered from lowest to highest p-values. These values are in the right diagonal of the probability values matrix.
+
+***
+#### Linear Algebra and Correlation
+
+Let's invert the correlation matrix to find the precision matrix and conduct LU decomposition.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Precision Matrix
+precision = solve(res[["r"]])
+precision
+
+# Correlation matrix times Precision matrix
+cp = res[["r"]] %*% precision
+cp
+
+# Precision matrix times Correlation matrix
+pc = precision %*% res[["r"]]
+pc
+
+# LU decomposition
+expand(lu(precision))
+```
+
+***
+#### Calculus-based Probability & Statistics
+
+From the descriptive statistic, one of the variable of interest is positively skewed, namely `LotArea`, with a skewness of 12.18.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+skew(train$LotArea)
+
+# With the MASS library, fitdistr is used to fit the data to an exponential probability density function
+LotArea_exp = fitdistr(train$LotArea, "exponential")
+LotArea_exp
+
+# Generate 1000 samples from the exponential distribution
+y = rexp(1000, LotArea_exp$estimate)
+
+ggplot(train, aes(x = LotArea)) + geom_histogram(aes(y = ..density..,fill = "Observed"),bins = 50,alpha=0.4) + geom_histogram(data = data.frame(y),aes(x = y, y = ..density.., fill = "Simulated"), bins = 100, alpha = 0.5) + theme_minimal() + theme(legend.title = element_blank()) + scale_fill_brewer(palette = "Set2") + labs(title = "Plots of Lot Areas", x = "Square Feet", y = "Proportion") + xlim(0, 10^5)
+```
+
+From the graph, it is evident that the observed graph of the data does not fit too well with the simulated dataset. Thus, let's compare the 5th and 95th percentiles of the exponential pdf and empirical data.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Exponential PDF
+qexp(c(0.05,0.95),LotArea_exp$estimate)
+
+# Emperical Data
+quantile(train$LotArea, probs = c(0.05,0.95))
+
+# 95% condifence interval of empirical data
+z = qnorm(0.95)
+a = z * sd(train$LotArea)/sqrt(length(train$LotArea))
+
+CI = matrix(c(round(mean(train$LotArea - a),2), round(mean(train$LotArea + a),2)))
+rownames(CI) = c("Lower CI","Upper CI")
+CI
+
+# Exponential PDF and Emperical Data means
+means = matrix(c(mean(train$LotArea), mean(y)))
+rownames(means) = c("Mean of LotArea","Mean of EXP")
+means
+```
+
+The model’s sample mean lies within the 95% confidence interval for the mean. Thus, an exponential distribution does appear to be an appropriate model that fits the lot area. In spite of this, based on the graph of the observed and simulated data, it is still not the best fitted model.
+
+***
+#### Modeling
+
+Now, finding the best fit model with the data using Stepwise Regression.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+dataset = train %>% select_if(is.numeric) %>% filter(complete.cases(.))
+
+# Remove Outlier
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+  qnt <- quantile(x, probs = c(.30, .70), na.rm = na.rm, ...)
+  caps <- quantile(x, probs=c(.05, .95), na.rm = T)
+  H <- 1.5 * IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- caps[1]
+  y[x > (qnt[2] + H)] <- caps[2]
+  y
+}
+remove_all_outliers <- function(df){
+  df[,sapply(df, is.numeric)] <- lapply(df[,sapply(df, is.numeric)], remove_outliers)
+  df
+}
+
+dataset_new <- remove_all_outliers(dataset)
+
+# Fit the full model
+model <- lm(SalePrice ~., data = dataset_new)
+
+# Stepwise Regression model
+step <- stepAIC(model, direction = "both", trace = FALSE)
+summary(step)
+```
+
+##### Prediction
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Using the test dataset to make the prediction.
+# All tranformation and new variable from train data is created in testdata
+testdata$TotalPorch = rowSums(testdata[,c(67:71)])
+
+testdata$SalePrice = predict(step, testdata)
+
+testdata[is.na(testdata)] = mean(testdata$SalePrice, na.rm = TRUE)
+
+submission = subset(testdata, select = c("Id", "SalePrice"))
+
+write.csv(submission, file = "sam13hopexlife_submission.csv")
+```
+
+
+##### Kaggle.com
+![](K:\2019 -2021 CUNY SPS\FALL 2019\DATA 605\Final\kaggle.png)

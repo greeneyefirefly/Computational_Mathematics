@@ -1,0 +1,81 @@
+---
+title: 'CUNY MSDS Data 605 HW #14'
+author: "Samantha Deokinanan"
+date: "29th November, 2019"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '4'
+---
+***  
+### Overview  
+This week, we’ll work out some Taylor Series expansions of popular functions.
+
+1. $f(x) = \frac{1}{(1−x)}$  
+2. $f(x) = e^{x}$  
+3. $f(x)= \ln(1+x)$  
+
+For each function, only consider its valid ranges as indicated in the notes when you are computing the Taylor Series expansion.
+
+**NB**  
+The Taylor series of $f(x)$, centered at c is $\sum_{n=0}^{\infty}\frac{f^{(n)}(c)}{n!}(x-c)^n$.  
+When $c=0$, the Maclaurin series of $f(x)$ is $\sum_{n=0}^{\infty}\frac{f^{(n)}(0)}{n!}(x)^n$.  
+
+***
+### Problem 1
+Firstly, find a few derivatives of $f(x) = \frac{1}{(1−x)}$ and evaluate them at $x=0$:
+
+$$\begin{align}
+f^{(0)}(x) = (1-x)^{-1} &\Rightarrow f^{(0)}(0) = 1 \\
+f^{(1)}(x) = (1-x)^{-2} &\Rightarrow f^{(1)}(0) = 1 \\
+f^{(2)}(x) = (2)(1-x)^{-3} &\Rightarrow f^{(2)}(0) = 2 \\
+f^{(3)}(x) = (2)(3)(1-x)^{-4} &\Rightarrow f^{(3)}(0) = 6 \\
+f^{(4)}(x) = (2)(3)(4)(1-x)^{-5} &\Rightarrow f^{(4)}(0) = 24 \\
+f^{(5)}(x) = (2)(3)(4)(5)(1-x)^{-6} &\Rightarrow f^{(5)}(0) = 120 \\
+f^{(6)}(x) = (2)(3)(4)(5)(6)(1-x)^{-7} &\Rightarrow f^{(6)}(0) = 720\\
+\vdots \qquad &\Rightarrow \qquad \vdots\\
+f^{(n)}(x) = {n!}{(1-x)^{-(n+1)}} &\Rightarrow f^{(n)}(0) = n!\\
+\end{align}$$
+
+Thus, substitute $f^{(n)}(0)$ into the Maclaurin series, the Taylor series is:
+
+$\sum_{n=0}^{\infty}\frac{f^{(n)}(0)}{n!}(x)^n = \sum_{n=0}^{\infty}\frac{n!}{n!}(x)^n =\sum_{n=0}^{\infty}x^n$
+
+***
+### Problem 2
+Firstly, find a few derivatives of $f(x) = e^{x}$ and evaluate them at $x=0$:
+
+$$\begin{align}
+f^{(0)}(x) = e^x &\Rightarrow f^{(0)}(0) = 1 \\
+f^{(1)}(x) = e^x &\Rightarrow f^{(1)}(0) = 1 \\
+f^{(2)}(x) = e^x &\Rightarrow f^{(2)}(0) = 1 \\
+f^{(3)}(x) = e^x &\Rightarrow f^{(3)}(0) = 1 \\
+\vdots \qquad &\Rightarrow \qquad \vdots\\
+f^{(n)}(x) = e^x &\Rightarrow f^{(n)}(0) = 1 \\
+\end{align}$$
+
+Thus, substitute $f^{(n)}(0)$ into the Maclaurin series, the Taylor series is:
+
+$\sum_{n=0}^{\infty}\frac{f^{(n)}(0)}{n!}(x)^n = \sum_{n=0}^{\infty}\frac{1}{n!}(x)^n =\sum_{n=0}^{\infty}\frac{x^n}{n!}$
+
+***
+### Problem 3
+Firstly, find a few derivatives of $f(x)= \ln(1+x)$ and evaluate them at $x=0$:
+
+$$\begin{align}
+f^{(0)}(x) =  \ln(1+x) &\Rightarrow f^{(0)}(0) = 0 \\
+f^{(1)}(x) =  (1 + x)^{-1} &\Rightarrow f^{(1)}(0) = 1 \\
+f^{(2)}(x) = (-1)(1+x)^{-2} &\Rightarrow f^{(2)}(0) = -1 \\
+f^{(3)}(x) = (-1)(-2)(1+x)^{-3} &\Rightarrow f^{(3)}(0) = 2 \\
+f^{(4)}(x) = (-1)(-2)(-3)(1+x)^{-4} &\Rightarrow f^{(4)}(0) = -6 \\
+f^{(5)}(x) = (-1)(-2)(-3)(-4)(1+x)^{-5} &\Rightarrow f^{(5)}(0) = 24 \\
+\vdots \qquad &\Rightarrow \qquad \vdots\\
+f^{(n)}(x) = (-1)^{n+1}(n-1)!(1+x)^{-n} &\Rightarrow f^{(n)}(0) = (-1)^{n+1} (n-1)!\\
+\end{align}$$
+
+Note that at $n=0$, the function is undefined. Thus, substitute $f^{(n)}(0)$ into the Maclaurin series, the Taylor series, from $n=1$, is:
+
+$\sum_{n=0}^{\infty}\frac{f^{(n)}(0)}{n!}(x)^n = \sum_{n=0}^{\infty}\frac{(-1)^{n+1} (n-1)!}{n!}(x)^n = \sum_{n=1}^{\infty}\frac{(-1)^{n+1}x^n}{n}$
+
+***

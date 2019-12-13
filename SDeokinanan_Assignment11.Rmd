@@ -1,0 +1,108 @@
+---
+title: 'CUNY MSDS Data 605 HW #11'
+author: "Samantha Deokinanan"
+date: "10th November, 2019"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+***
+# Problem Set #1
+Using the “cars” dataset in R, build a linear model for stopping distance as a function of speed and replicate the analysis of your textbook chapter 3 (visualization, quality evaluation of the model, and residual analysis.)
+
+***  
+## The Dataset 
+The data give the speed of cars and the distances taken to stop. Note that the data were recorded in the 1920s. It is a dataframe with 50 observations on 2 variables:
+
+[1] speed, numeric, Speed (mph)  
+[2] dist, numeric, Stopping distance (ft)
+
+### Loading the data
+The dataset is already within R datasets package.
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Loading the dataset
+attach(cars)
+head(cars)
+```
+
+***  
+### Data Exploration & Visualization 
+After loading the `cars` dataset in R, a few data exploration techniques were conducted to understand the variables in question. Based on the skewness of this dataset, there does not appear to be strong influences from outliers since they are nearly zero. Additionally, the kurtosis is near zero which also suggests a normal distribution can be assumed.
+
+```{r}
+psych::describe(cars)
+```
+
+From the density plots below, it appears that `speed` follows close to a normal distribution, while `dist` has a slightly heavier tail. There is also a scatter plot of `speed` and `dist`. It shows that as speed tends to increase, the stopping distance also increases, as expected. This, and with a relatively high correlation coefficient of 0.81, could be a good indication that a linear relationship may fit the predictor and the independent variable of the data well. 
+
+```{r}
+GGally::ggpairs(cars, columns = 1:2)
+```
+
+***
+## Analysis & Results
+### The Linear Model Function
+
+A regression models is fitted to predict stopping distance in feet based on the speed in mph of the cars. Therefore, the model form is $Y = a_{0}+a_{1} \times X_{1} \rightarrow dist = a_{0}+a_{1} \times speed$.
+
+```{r}
+model = lm(dist ~ speed, data = cars)
+model
+```
+
+As a result, the best fit linear model is $dist = -17.58+3.932 \times speed$.
+
+The plot below is of the original data along with the fitted line highlights the calculated linear model and how well it fits the dataset.
+```{r}
+plot(cars$speed, cars$dist, xlab = 'Speed (mph)', ylab = 'Stopping Distance (ft)', 
+     main = 'Stopping Distance vs Speed')
+abline(model)
+```
+
+***
+### Quality of the Model
+
+More information about the fitted model can be examined to evaluate how well this model actually is. Below is the results of the model.
+
+```{r}
+summary(model)
+```
+
+The minimum and maximum residual are -29.07 and 43.20, respectively. The median is -2.27. A good model is expected to have a median near 0, and a minimum and maximum values of roughly the same magnitude. For this model, the residual values are not too far off than expected for normally-distributed numbers. Next, are the estimated coefficient and standard error values. The standard error value is nearly 9 times smaller than the estimated coefficient value. This suggests that there is relatively little variability in the slope estimate. The standard error for the intercept is 6.76, which is far from the estimated value of -17.58 for this coefficient. These suggest that the estimate of this coefficient for this model can vary a little.
+
+The last column is the significance or p-value of the coefficients. In this case, the probability that `speed` is not relevant in this model is $1.49 \times 10^{-12}$. The probability that the intercept is not relevant is 0.0123. With both p-values smaller than a confidence level of 5%, they are statistically significant to the model.
+
+The first and third quantiles of the previous residuals are 1.6 times the residual standard error, implying that the residuals are distributed normally. The adjusted $R^{2}$ is 0.64, which is not as close to one as wanted, suggesting that this model only explains 64% of the variation.
+
+***
+### Residual Analysis
+
+An analysis of the residual will further allow an understanding of how well the model fits the data. A plot of the residual values versus the input values for the one-factor model depicts that the errors may likely have a constant variance since the residuals are scattered randomly but the spread is quite far from zero which is altering. 
+
+```{r}
+# Plot of the residual values
+plot(fitted(model), resid(model), xlab = 'Fitted Values', ylab = 'Residuals')
+abline(0,0)
+```
+
+Moreover, from the histogram and Q-Q plot, the residuals appear to be nearly normally distributed, *nearly* because it also appears slightly skewed. The Q-Q plot has a majority of points on or very near the line but diverges at the upper extremity. Q-Q plots like this suggest that there are more extreme values than expected and not as normally distributed, which was confirmed from the histogram.
+
+```{r}
+# Histogram of Residuals
+hist(model$residuals, main = "Histogram of Residuals", xlab = "Residuals", ylim = c(0, 0.035), 
+     prob = TRUE)
+curve(dnorm(x, mean = mean(model$residuals), sd = sd(model$residuals)), col = "darkblue", 
+      add = TRUE)
+
+# Q-Q plot
+qqnorm(resid(model))
+qqline(resid(model))
+```
+
+***
+## Conclusion
+
+In conclusion, a simple linear model where the stopping distance is a function of speed does not strongly fit the `cars` dataset but it can be a good-enough model to make a close prediction. The linear model is therefore $dist = -17.58+3.932 \times speed$. This was established because the residual analyses did, for the most parts, resembled characteristics of a normal distribution.
+
+***
