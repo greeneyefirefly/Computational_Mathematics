@@ -61,19 +61,19 @@ P3
 Investigate whether $P(X > x \ \&\ Y > y) = P(X > x)P(Y > y)$ by building a table and evaluating the marginal and joint probabilities.
 
 ```{r}
-a = length(X[X > x & Y > y]) # P(X > x & Y > y)
-b = length(X[X > x & Y < y]) # P(X > x & Y < y)
-c = length(X[X < x & Y > y]) # P(X < x & Y > y)
-d = length(X[X < x & Y < y]) # P(X < x & Y < y)
+a = length(X[X > x & Y > y])/10000 # P(X > x & Y > y)
+b = length(X[X > x & Y < y])/10000 # P(X > x & Y < y)
+c = length(X[X < x & Y > y])/10000 # P(X < x & Y > y)
+d = length(X[X < x & Y < y])/10000 # P(X < x & Y < y)
 
-ptable <- matrix(c(a,b,c,d), nrow = 2)
-colnames(ptable) <- c('X > x', 'X < x')
-rownames(ptable) <- c('Y > y', 'Y < y')
-ptable <- as.table(ptable)
+ptable = matrix(c(a,b,a+b,c,d,c+d,a+c,b+d,a+b+c+d), nrow = 3)
+colnames(ptable) = c('P(X > x)', 'P(X < x)', 'marginal')
+rownames(ptable) = c('P(Y > y)', 'P(Y < y)', 'marginal')
+ptable = as.table(ptable)
 ptable
 
 # a is P(X > x & Y > y)
-a/10000
+a
 
 # P(X > x)P(Y > y)
 P2
@@ -90,6 +90,7 @@ Both the Fisher's Exact Test and the Chi-Square Test are test of independence su
 $H_{0} =$ the proportions at one variable are the same for different values of the second variable.
 
 ```{r}
+ptable = as.table(matrix(c(a,b,c,d)*10000, nrow = 2))
 fisher.test(ptable)
 ```
 
@@ -203,8 +204,10 @@ pc = precision %*% res[["r"]]
 pc
 
 # LU decomposition
-expand(lu(precision))
+expand(lu(res[["r"]]))
 ```
+
+By multiplying the correlation matrix by the precision matrix and vice versa, result is the identity matrix. Moreover, the LU decomposition resulted in the correlation matrix after multiplying the two components. 
 
 ***
 #### Calculus-based Probability & Statistics
@@ -258,27 +261,27 @@ Now, finding the best fit model with the data using Stepwise Regression.
 dataset = train %>% select_if(is.numeric) %>% filter(complete.cases(.))
 
 # Remove Outlier
-remove_outliers <- function(x, na.rm = TRUE, ...) {
-  qnt <- quantile(x, probs = c(.30, .70), na.rm = na.rm, ...)
-  caps <- quantile(x, probs=c(.05, .95), na.rm = T)
-  H <- 1.5 * IQR(x, na.rm = na.rm)
-  y <- x
-  y[x < (qnt[1] - H)] <- caps[1]
-  y[x > (qnt[2] + H)] <- caps[2]
+remove_outliers = function(x, na.rm = TRUE, ...) {
+  qnt = quantile(x, probs = c(.30, .70), na.rm = na.rm, ...)
+  caps = quantile(x, probs=c(.05, .95), na.rm = T)
+  H = 1.5 * IQR(x, na.rm = na.rm)
+  y = x
+  y[x < (qnt[1] - H)] = caps[1]
+  y[x > (qnt[2] + H)] = caps[2]
   y
 }
-remove_all_outliers <- function(df){
-  df[,sapply(df, is.numeric)] <- lapply(df[,sapply(df, is.numeric)], remove_outliers)
+remove_all_outliers = function(df){
+  df[,sapply(df, is.numeric)] = lapply(df[,sapply(df, is.numeric)], remove_outliers)
   df
 }
 
-dataset_new <- remove_all_outliers(dataset)
+dataset_new = remove_all_outliers(dataset)
 
 # Fit the full model
-model <- lm(SalePrice ~., data = dataset_new)
+model = lm(SalePrice ~., data = dataset_new)
 
 # Stepwise Regression model
-step <- stepAIC(model, direction = "both", trace = FALSE)
+step = stepAIC(model, direction = "both", trace = FALSE)
 summary(step)
 ```
 
@@ -300,4 +303,4 @@ write.csv(submission, file = "sam13hopexlife_submission.csv")
 
 
 ##### Kaggle.com
-![](K:\2019 -2021 CUNY SPS\FALL 2019\DATA 605\Final\kaggle.png)
+![](C:\Users\Deokinanan\Desktop\2019 -2021 CUNY SPS\FALL 2019\DATA 605\Final\kaggle.png)
